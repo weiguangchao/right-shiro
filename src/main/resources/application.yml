@@ -1,0 +1,85 @@
+server:
+  port: 8000
+  servlet:
+    context-path: /
+
+spring:
+  profiles:
+    active: dev
+  datasource:
+    druid:
+      # 初始化时建立物理连接的个数。初始化发生在显示调用init方法，或者第一次getConnection时
+      initial-size: 1
+      # 最小连接池数量
+      min-idle: 1
+      # 最大连接池数量
+      max-active: 20
+      # 配置获取连接等待超时的时间
+      max-wait: 60000
+      # 用来检测连接是否有效的sql，要求是一个查询语句，常用select 'x'。如果validationQuery为null，testOnBorrow、testOnReturn、testWhileIdle都不会起作用。
+      validation-query: SELECT 1
+      # 建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。
+      test-while-idle: true
+      # 申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。
+      test-on-borrow: false
+      # 归还连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。
+      test-on-return: false
+      # 是否缓存preparedStatement，也就是PSCache。PSCache对支持游标的数据库性能提升巨大，比如说oracle。在mysql下建议关闭。
+      pool-prepared-statements: true
+      # 要启用PSCache，必须配置大于0，当大于0时，poolPreparedStatements自动触发修改为true。在Druid中，不会存在Oracle下PSCache占用内存过多的问题，可以把这个数值配置大一些，比如说100
+      max-pool-prepared-statement-per-connection-size: 20
+      # 属性类型是字符串，通过别名的方式配置扩展插件，常用的插件有：
+      # 监控统计用的filter:stat
+      # 日志用的filter:log4j
+      # 防御sql注入的filter:wall
+      filters: stat,slf4j,wall
+      # 合并多个DruidDataSource的监控数据
+      use-global-data-source-stat: false
+  jpa:
+    show-sql: true
+    properties:
+      # hibernate配置
+      hibernate:
+        # 美化sql
+        format_sql: true
+        # dialect设置
+        # dialect: org.org.hibernate.dialect.Oracle10gDialect
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
+
+
+right:
+  # rest对权限配置开关
+  web-access:
+    enable: true
+  jwt:
+    secret-key: 82macyayj23q5zh57t2sxyy49zxhxge39dmoc19lcaryuszwlpdh689b4d6iqcw28lk18ac6j1ndxj21dzxvauxtvl
+  password:
+    encrypt:
+      enable: true
+  login:
+    token-key:
+      timeout: 50000
+  # 调试模式
+  debug:
+    # enable为true时可以使用自定义的用户
+    enable: true
+    # 用户标识，对应库表中的uid
+    username: root
+    password: root
+
+---
+# 开发环境配置
+debug: false
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/right_shiro2?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: 127.0.0.1
+    port: 6379
